@@ -19,6 +19,8 @@ import (
 	"runtime"
 	"log"
 	"fmt"
+	"os"
+	"encoding/json"
 )
 
 type Message interface {
@@ -27,21 +29,32 @@ type Message interface {
 
 const dirSeperator string = "/"
 
-type Config struct {
+type Configuration struct {
 	OS string
 	Username string
 	HomeDir string
 	KeyFile []byte
-
 }
 
-func buildConfig() *Config {
+// Setup the applicaiton with the needed configuration from
+// the environment and from the user defined confuration
+// file.
+func (c *Configuration) buildConfig() *Configuration {
+	var confFile string = "config.json"
 	userData, err := user.Current()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	return &Config{
+	file, _ := os.Open(confFile)
+	decoder := json.NewDecoder(file)
+	configuration := Configuration{}
+	err := decoder.Decode(&configuration)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	return &Configuration{
 		OS: runtime.GOOS,
 		Username: userData.Name,
 		HomeDir: userData.HomeDir,
@@ -53,7 +66,6 @@ func main() {
 	fmt.Println("Sending Message")
 	gm := New("Brian Downs", "brian.downs@gmail.com", "Down-Low Message")
 	gm.Body = []byte("This is the message")
-	//gm.SendMessage()
 	m := Message(gm)
 	m.Send()
 }
