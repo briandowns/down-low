@@ -25,11 +25,11 @@ import (
 	"runtime"
 )
 
-type Message interface {
-	Send()
-}
-
 const dirSeperator string = "/"
+
+type Message interface {
+	Send(*Configuration)
+}
 
 type Configuration struct {
 	OS            string
@@ -44,10 +44,16 @@ type Configuration struct {
 	KeyFile       []byte
 }
 
+func parseArgs() {
+	//
+}
+
 // Setup the applicaiton with the needed configuration from
 // the environment and from the user defined confuration
 // file.
-func (c *Configuration) buildConfig() (*Configuration, error) {
+func buildConfig() (*Configuration, error) {
+	var configuration Configuration
+
 	confFile := ".down-low.json"
 
 	userData, err := user.Current()
@@ -60,20 +66,27 @@ func (c *Configuration) buildConfig() (*Configuration, error) {
 		log.Fatal(err)
 	}
 
-	// Look in the user's home dir to find a
+	// Look in the user's home dir to find a down-low config file.
 	for _, i := range results {
 		if i.Name() == confFile {
-			c.ConfigFile = confFile
-
-			file, _ := os.Open(confFile)
+			file, err := os.Open(confFile)
+			if err != nil {
+				log.Fatal(err)
+			}
 
 			decoder := json.NewDecoder(file)
-			configuration := Configuration{}
+			configuration = Configuration{}
 
-			err := decoder.Decode(&configuration)
+			err = decoder.Decode(&configuration)
 			if err != nil {
 				log.Fatalln(err)
 			}
+
+			configuration.ConfigFile = confFile
+			configuration.OS = runtime.GOOS
+			configuration.Username = userData.Username
+			configuration.HomeDir = userData.HomeDir
+			configuration.KeyFile = []byte(fmt.Sprintf("%s%s%s", userData.HomeDir, dirSeperator))
 
 			break
 		} else {
@@ -81,19 +94,18 @@ func (c *Configuration) buildConfig() (*Configuration, error) {
 		}
 	}
 
-	return &Configuration{
-		OS:       runtime.GOOS,
-		Username: userData.Name,
-		HomeDir:  userData.HomeDir,
-		GmailAddress: c.GmailAddress,
-		GmailUser: c.GmailUser,
-		GmailPassword: c.GmailPassword,
-		GmailServer: c.GmailServer,
-		GmailPort: c.GmailPort,
-		KeyFile:  []byte(fmt.Sprintf("%s%s%s", userData.HomeDir, dirSeperator)),
-	}, nil
+	return &configuration, nil
 }
 
 func main() {
-	fmt.Println("")
+	if os.Getenv("GOMAXPROCS") == "" {
+		runtime.GOMAXPROCS(runtime.NumCPU())
+	}
+
+	parseArgs()
+	conf, err := buildConfig()
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(conf)
 }
