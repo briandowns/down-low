@@ -1,6 +1,6 @@
 # down-low
 
-Send encrypted messages through different messaging services.
+Go (golang) application to send encrypted messages through different messaging services as well as decrypt message sent from other users of this system or anything encrypted with AES or RSA provided you have the keys.
 
 - Gmail
 - Twitter
