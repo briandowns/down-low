@@ -69,7 +69,7 @@ func (g *GmailMessageData) Send() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	
+
 	t := template.New("emailTemplate")
 
 	t, err = t.Parse(emailTemplate)

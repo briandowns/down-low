@@ -39,14 +39,16 @@ type Configuration struct {
 	GmailAddress  string `json:"gmail_address"`
 	GmailUser     string `json:"gmail_user"`
 	GmailPassword string `json:"gmail_password"`
+	GmailServer   string `json:"gmail_server_address"`
+	GmailPort     int    `json:"gmail_server_port"`
 	KeyFile       []byte
 }
 
 // Setup the applicaiton with the needed configuration from
 // the environment and from the user defined confuration
 // file.
-func (c *Configuration) buildConfig() *Configuration {
-	confFile := "config.json"
+func (c *Configuration) buildConfig() (*Configuration, error) {
+	confFile := ".down-low.json"
 
 	userData, err := user.Current()
 	if err != nil {
@@ -58,35 +60,40 @@ func (c *Configuration) buildConfig() *Configuration {
 		log.Fatal(err)
 	}
 
+	// Look in the user's home dir to find a
 	for _, i := range results {
 		if i.Name() == confFile {
 			c.ConfigFile = confFile
+
+			file, _ := os.Open(confFile)
+
+			decoder := json.NewDecoder(file)
+			configuration := Configuration{}
+
+			err := decoder.Decode(&configuration)
+			if err != nil {
+				log.Fatalln(err)
+			}
+
 			break
 		} else {
-			errors.New("Config file not found!")
+			return nil, errors.New("Config file not found!")
 		}
-	}
-
-	file, _ := os.Open(confFile)
-	decoder := json.NewDecoder(file)
-	configuration := Configuration{}
-	err := decoder.Decode(&configuration)
-	if err != nil {
-		log.Fatalln(err)
 	}
 
 	return &Configuration{
 		OS:       runtime.GOOS,
 		Username: userData.Name,
 		HomeDir:  userData.HomeDir,
+		GmailAddress: c.GmailAddress,
+		GmailUser: c.GmailUser,
+		GmailPassword: c.GmailPassword,
+		GmailServer: c.GmailServer,
+		GmailPort: c.GmailPort,
 		KeyFile:  []byte(fmt.Sprintf("%s%s%s", userData.HomeDir, dirSeperator)),
-	}
+	}, nil
 }
 
 func main() {
-	fmt.Println("Sending Message")
-	gm := New("Brian Downs", "brian.downs@gmail.com", "Down-Low Message")
-	gm.Body = []byte("This is the message")
-	m := Message(gm)
-	m.Send()
+	fmt.Println("")
 }
