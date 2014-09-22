@@ -19,10 +19,10 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"net/smtp"
 	"strconv"
-	"bytes"
 	"text/template"
 )
 
@@ -49,15 +49,15 @@ type GmailMessageData struct {
 	Body    []byte
 }
 
-func New(from string, to string, subject string) * GmailMessageData {
+func New(from string, to string, subject string) *GmailMessageData {
 	return &GmailMessageData{From: from, To: to, Subject: subject}
 }
 
 func (g *GmailMessageData) Send() {
 	// TODO: Get into a config structure ASAP.
-	emailUser := &GmailSender{ "brian.downs", "********", "smtp.gmail.com", 587 }
+	emailUser := &GmailSender{"brian.downs", "********", "smtp.gmail.com", 587}
 
-	auth := smtp.PlainAuth("", emailUser.Username, emailUser.Password, emailUser.EmailServer, )
+	auth := smtp.PlainAuth("", emailUser.Username, emailUser.Password, emailUser.EmailServer)
 	var err error
 	var doc bytes.Buffer
 
@@ -67,19 +67,9 @@ func (g *GmailMessageData) Send() {
 		[]string{"brian.downs@gmail.com"},
 		doc.Bytes())
 	if err != nil {
-		fmt.Println( err)
+		fmt.Println(err)
 	}
-
-	context := g
-	/*
-	context := &GmailMessageData{
-		"Brian Downs",
-		"brian.downs@gmail.com",
-		subject,
-		[]byte("Encrypted message would go here."),
-	}
-	*/
-
+	
 	t := template.New("emailTemplate")
 
 	t, err = t.Parse(emailTemplate)
@@ -87,7 +77,7 @@ func (g *GmailMessageData) Send() {
 		fmt.Println("error trying to parse mail template")
 	}
 
-	err = t.Execute(&doc, context)
+	err = t.Execute(&doc, g)
 	if err != nil {
 		fmt.Println(err)
 	}

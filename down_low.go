@@ -15,12 +15,14 @@
 package main
 
 import (
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io/ioutil"
+	"log"
+	"os"
 	"os/user"
 	"runtime"
-	"log"
-	"fmt"
-	"os"
-	"encoding/json"
 )
 
 type Message interface {
@@ -30,20 +32,39 @@ type Message interface {
 const dirSeperator string = "/"
 
 type Configuration struct {
-	OS string
-	Username string
-	HomeDir string
-	KeyFile []byte
+	OS            string
+	Username      string
+	HomeDir       string
+	ConfigFile    string
+	GmailAddress  string `json:"gmail_address"`
+	GmailUser     string `json:"gmail_user"`
+	GmailPassword string `json:"gmail_password"`
+	KeyFile       []byte
 }
 
 // Setup the applicaiton with the needed configuration from
 // the environment and from the user defined confuration
 // file.
 func (c *Configuration) buildConfig() *Configuration {
-	var confFile string = "config.json"
+	confFile := "config.json"
+
 	userData, err := user.Current()
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	results, err := ioutil.ReadDir(userData.HomeDir)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, i := range results {
+		if i.Name() == confFile {
+			c.ConfigFile = confFile
+			break
+		} else {
+			errors.New("Config file not found!")
+		}
 	}
 
 	file, _ := os.Open(confFile)
@@ -55,10 +76,10 @@ func (c *Configuration) buildConfig() *Configuration {
 	}
 
 	return &Configuration{
-		OS: runtime.GOOS,
+		OS:       runtime.GOOS,
 		Username: userData.Name,
-		HomeDir: userData.HomeDir,
-		KeyFile: []byte(fmt.Sprintf("%s%s%s", userData.HomeDir, dirSeperator)),
+		HomeDir:  userData.HomeDir,
+		KeyFile:  []byte(fmt.Sprintf("%s%s%s", userData.HomeDir, dirSeperator)),
 	}
 }
 
