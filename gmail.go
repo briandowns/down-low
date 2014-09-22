@@ -53,9 +53,8 @@ func New(from string, to string, subject string) *GmailMessageData {
 	return &GmailMessageData{From: from, To: to, Subject: subject}
 }
 
-func (g *GmailMessageData) Send() {
-	// TODO: Get into a config structure ASAP.
-	emailUser := &GmailSender{"brian.downs", "********", "smtp.gmail.com", 587}
+func (g *GmailMessageData) Send(c *Configuration) {
+	emailUser := &GmailSender{c.GmailUser, c.GmailPassword, c.GmailServer, c.GmailPort}
 
 	auth := smtp.PlainAuth("", emailUser.Username, emailUser.Password, emailUser.EmailServer)
 	var err error

@@ -22,15 +22,29 @@ import (
 	"log"
 	"os"
 	"os/user"
+	"path/filepath"
 	"runtime"
 )
 
-const dirSeperator string = "/"
+const (
+	dirSeperator string = "/"
+)
 
 type Message interface {
 	Send(*Configuration)
 }
 
+// Prepping for a later version of the configuration
+/*
+type Configuration struct {
+	OS         string
+	Username   string
+	HomeDir    string
+	ConfigFile string
+	GmailConf  *GmailSender
+	KeyFile    []byte
+}
+*/
 type Configuration struct {
 	OS            string
 	Username      string
@@ -41,15 +55,15 @@ type Configuration struct {
 	GmailPassword string `json:"gmail_password"`
 	GmailServer   string `json:"gmail_server_address"`
 	GmailPort     int    `json:"gmail_server_port"`
-	KeyFile       []byte
+	//	KeyFile       []byte
 }
 
 func parseArgs() {
 	//
 }
 
-// Setup the applicaiton with the needed configuration from
-// the environment and from the user defined confuration
+// Setup the application with the needed configuration from
+// the environment and from the user defined configuration
 // file.
 func buildConfig() (*Configuration, error) {
 	var configuration Configuration
@@ -68,8 +82,14 @@ func buildConfig() (*Configuration, error) {
 
 	// Look in the user's home dir to find a down-low config file.
 	for _, i := range results {
+		log.Println(i.Name())
 		if i.Name() == confFile {
-			file, err := os.Open(confFile)
+			absPath, pathErr := filepath.Abs(i.Name())
+			log.Println(absPath)
+			if pathErr != nil {
+				log.Fatal(pathErr)
+			}
+			file, err := os.Open(absPath)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -86,7 +106,7 @@ func buildConfig() (*Configuration, error) {
 			configuration.OS = runtime.GOOS
 			configuration.Username = userData.Username
 			configuration.HomeDir = userData.HomeDir
-			configuration.KeyFile = []byte(fmt.Sprintf("%s%s%s", userData.HomeDir, dirSeperator))
+			//configuration.KeyFile = []byte(fmt.Sprintf("%s%s%s", userData.HomeDir, dirSeperator))
 
 			break
 		} else {
