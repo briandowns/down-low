@@ -24,6 +24,7 @@ import (
 	"os/user"
 	"path/filepath"
 	"runtime"
+	"flag"
 )
 
 type Msg interface {
@@ -33,14 +34,13 @@ type Msg interface {
 // Prepping for a later version of the configuration
 
 type Configuration struct {
-	OS         string
-	Username   string
-	HomeDir    string
-	ConfigFile string
-	GmailConf  *GmailConf
-	KeyFile    []byte
+	OS          string
+	Username    string
+	HomeDir     string
+	ConfigFile  string
+	GmailConfig *GmailConf
+	KeyFile     []byte
 }
-
 
 type Message struct {
 	From    string
@@ -61,7 +61,17 @@ type Configuration struct {
 	//	KeyFile       []byte
 }
 
-func parseArgs() {
+// Process the CLI arguments.
+func processArgs() {
+	// -key="/path/to/key" -service="service" -to="user@service" -m
+	var keyPath = flag.String("key", "", "Path to key file.")
+	var service = flag.String("service", "", "Service to send message through.")
+	var to = flag.String("to", "", "User to send message to.")
+	var message = flag.Bool("m", false, "Message to send.")
+}
+
+// Determine the type of key given by the user.
+func detectKeyType() {
 	//
 }
 
