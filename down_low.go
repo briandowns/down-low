@@ -47,21 +47,21 @@ type Configuration struct {
 */
 
 type Message struct {
-	From string
-	To string
-	Body []byte
+	From    string
+	To      string
+	Body    []byte
+	Subject string
+}
+
+func New(from string, to string, subject string) *Message {
+	return &Message{From: from, To: to, Subject: subject}
 }
 
 type Configuration struct {
-	OS            string
-	Username      string
-	HomeDir       string
-	ConfigFile    string
-	GmailAddress  string `json:"gmail_address"`
-	GmailUser     string `json:"gmail_user"`
-	GmailPassword string `json:"gmail_password"`
-	GmailServer   string `json:"gmail_server_address"`
-	GmailPort     int    `json:"gmail_server_port"`
+	OS         string
+	Username   string
+	HomeDir    string
+	ConfigFile string
 	//	KeyFile       []byte
 }
 

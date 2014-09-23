@@ -36,23 +36,14 @@ Subject: {{.Subject}}
 )
 
 type GmailConf struct {
-	Username    string
-	Password    string
-	EmailServer string
-	Port        int
+	Username string `json:"gmail_user"`
+	Password string `json:"gmail_password"`
+	Server   string `json:"gmail_server_address"`
+	Port     int    `json:"gmail_server_port"`
 }
 
-type GmailMessage struct {
-	Message
-	Subject string
-}
-
-func New(from string, to string, subject string) *GmailMessage {
-	return &GmailMessage{From: from, To: to, Subject: subject}
-}
-
-func (g *GmailMessage) Send(c *Configuration) {
-	emailUser := &GmailConf{c.GmailUser, c.GmailPassword, c.GmailServer, c.GmailPort}
+func (m *Message) Send(c *Configuration) {
+	emailUser := &GmailConf{c.Username, c.Password, c.Server, c.Port}
 
 	auth := smtp.PlainAuth("", emailUser.Username, emailUser.Password, emailUser.EmailServer)
 	var err error
@@ -74,7 +65,7 @@ func (g *GmailMessage) Send(c *Configuration) {
 		fmt.Println("error trying to parse mail template")
 	}
 
-	err = t.Execute(&doc, g)
+	err = t.Execute(&doc, m)
 	if err != nil {
 		fmt.Println(err)
 	}
