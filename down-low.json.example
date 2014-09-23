@@ -1,5 +1,8 @@
 {
-    "gmail_address": "jimmy.joe@gmail.com",
-    "gmail_user": "jimmy.joe",
-    "gmail_password": "jjsp4ssw04d"
+    "gmail_server_address_": "smtp.gmail.com",
+    "gmail_server_port": 587,
+    "gmail_address": "anyone@gmail.com",
+    "gmail_user": "anyone",
+    "gmail_password": "anything"
+
 }

@@ -26,16 +26,12 @@ import (
 	"runtime"
 )
 
-const (
-	dirSeperator string = "/"
-)
-
 type Msg interface {
 	Send(*Configuration)
 }
 
 // Prepping for a later version of the configuration
-/*
+
 type Configuration struct {
 	OS         string
 	Username   string
@@ -44,7 +40,7 @@ type Configuration struct {
 	GmailConf  *GmailConf
 	KeyFile    []byte
 }
-*/
+
 
 type Message struct {
 	From    string
@@ -75,13 +71,12 @@ func parseArgs() {
 func buildConfig() (*Configuration, error) {
 	var configuration Configuration
 
-	confFile := ".down-low.json"
-
 	userData, err := user.Current()
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	confFile := fmt.Sprintf("%s/%s", userData.HomeDir, ".down-low.json")
 	results, err := ioutil.ReadDir(userData.HomeDir)
 	if err != nil {
 		log.Fatal(err)
