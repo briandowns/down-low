@@ -36,10 +36,11 @@ Subject: {{.Subject}}
 )
 
 type GmailConf struct {
-	Username string `json:"gmail_user"`
-	Password string `json:"gmail_password"`
 	Server   string `json:"gmail_server_address"`
 	Port     int    `json:"gmail_server_port"`
+	Address  string `json:"gmail_address"`
+	Username string `json:"gmail_user"`
+	Password string `json:"gmail_password"`
 }
 
 func (m *Message) Send(c *Configuration) {

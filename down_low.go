@@ -17,6 +17,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -24,7 +25,6 @@ import (
 	"os/user"
 	"path/filepath"
 	"runtime"
-	"flag"
 )
 
 type Msg interface {
@@ -53,14 +53,6 @@ func New(from string, to string, subject string) *Message {
 	return &Message{From: from, To: to, Subject: subject}
 }
 
-type Configuration struct {
-	OS         string
-	Username   string
-	HomeDir    string
-	ConfigFile string
-	//	KeyFile       []byte
-}
-
 // Process the CLI arguments.
 func processArgs() {
 	// -key="/path/to/key" -service="service" -to="user@service" -m
@@ -80,11 +72,20 @@ func detectKeyType() {
 // file.
 func buildConfig() (*Configuration, error) {
 	var configuration Configuration
+	var gmconf GmailConf
 
 	userData, err := user.Current()
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	// TODO: Redo this so it doesn't look so terrible.
+	configuration = Configuration{}
+	configuration.ConfigFile = confFile
+	configuration.OS = runtime.GOOS
+	configuration.Username = userData.Username
+	configuration.HomeDir = userData.HomeDir
+	//configuration.KeyFile = []byte(fmt.Sprintf("%s%s%s", userData.HomeDir, dirSeperator))
 
 	confFile := fmt.Sprintf("%s/%s", userData.HomeDir, ".down-low.json")
 	results, err := ioutil.ReadDir(userData.HomeDir)
@@ -92,6 +93,7 @@ func buildConfig() (*Configuration, error) {
 		log.Fatal(err)
 	}
 
+	// TODO: Get rid of this loop.
 	// Look in the user's home dir to find a down-low config file.
 	for _, i := range results {
 		log.Println(i.Name())
@@ -107,25 +109,18 @@ func buildConfig() (*Configuration, error) {
 			}
 
 			decoder := json.NewDecoder(file)
-			configuration = Configuration{}
+			gmconf = GmailConf{}
 
-			err = decoder.Decode(&configuration)
+			err = decoder.Decode(&gmconf)
 			if err != nil {
 				log.Fatalln(err)
 			}
-
-			configuration.ConfigFile = confFile
-			configuration.OS = runtime.GOOS
-			configuration.Username = userData.Username
-			configuration.HomeDir = userData.HomeDir
-			//configuration.KeyFile = []byte(fmt.Sprintf("%s%s%s", userData.HomeDir, dirSeperator))
-
 			break
 		} else {
 			return nil, errors.New("Config file not found!")
 		}
 	}
-
+	configuration.GmailConfig = &gmconf
 	return &configuration, nil
 }
 
