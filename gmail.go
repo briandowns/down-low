@@ -35,26 +35,24 @@ Subject: {{.Subject}}
 `
 )
 
-type GmailSender struct {
+type GmailConf struct {
 	Username    string
 	Password    string
 	EmailServer string
 	Port        int
 }
 
-type GmailMessageData struct {
-	From    string
-	To      string
+type GmailMessage struct {
+	Message
 	Subject string
-	Body    []byte
 }
 
-func New(from string, to string, subject string) *GmailMessageData {
-	return &GmailMessageData{From: from, To: to, Subject: subject}
+func New(from string, to string, subject string) *GmailMessage {
+	return &GmailMessage{From: from, To: to, Subject: subject}
 }
 
-func (g *GmailMessageData) Send(c *Configuration) {
-	emailUser := &GmailSender{c.GmailUser, c.GmailPassword, c.GmailServer, c.GmailPort}
+func (g *GmailMessage) Send(c *Configuration) {
+	emailUser := &GmailConf{c.GmailUser, c.GmailPassword, c.GmailServer, c.GmailPort}
 
 	auth := smtp.PlainAuth("", emailUser.Username, emailUser.Password, emailUser.EmailServer)
 	var err error

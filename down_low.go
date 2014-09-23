@@ -30,7 +30,7 @@ const (
 	dirSeperator string = "/"
 )
 
-type Message interface {
+type Msg interface {
 	Send(*Configuration)
 }
 
@@ -41,10 +41,17 @@ type Configuration struct {
 	Username   string
 	HomeDir    string
 	ConfigFile string
-	GmailConf  *GmailSender
+	GmailConf  *GmailConf
 	KeyFile    []byte
 }
 */
+
+type Message struct {
+	From string
+	To string
+	Body []byte
+}
+
 type Configuration struct {
 	OS            string
 	Username      string
