@@ -16,22 +16,17 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/user"
-	"path/filepath"
 	"runtime"
 )
 
 type Msg interface {
 	Send(*Configuration)
 }
-
-// Prepping for a later version of the configuration
 
 type Configuration struct {
 	OS          string
@@ -56,21 +51,21 @@ func New(from string, to string, subject string) *Message {
 // Process the CLI arguments.
 func processArgs() {
 	// -key="/path/to/key" -service="service" -to="user@service" -m
-	var keyPath = flag.String("key", "", "Path to key file.")
-	var service = flag.String("service", "", "Service to send message through.")
-	var to = flag.String("to", "", "User to send message to.")
-	var message = flag.Bool("m", false, "Message to send.")
+	var keyPath *string = flag.String("key", "", "Path to key file.")
+	var service *string = flag.String("service", "", "Service to send message through.")
+	var to *string = flag.String("to", "", "User to send message to.")
+	var message *bool = flag.Bool("m", false, "Message to send.")
 }
 
 // Determine the type of key given by the user.
-func detectKeyType() {
+func detectKeyType() *CLIParameters {
 	//
 }
 
 // Setup the application with the needed configuration from
 // the environment and from the user defined configuration
 // file.
-func buildConfig() (*Configuration, error) {
+func buildConfig(keyPath string) (*Configuration, error) {
 	var configuration Configuration
 	var gmconf GmailConf
 
@@ -81,45 +76,25 @@ func buildConfig() (*Configuration, error) {
 
 	// TODO: Redo this so it doesn't look so terrible.
 	configuration = Configuration{}
-	configuration.ConfigFile = confFile
+	configuration.ConfigFile = fmt.Sprintf("%s/%s", userData.HomeDir, ".down-low.json")
 	configuration.OS = runtime.GOOS
 	configuration.Username = userData.Username
 	configuration.HomeDir = userData.HomeDir
-	//configuration.KeyFile = []byte(fmt.Sprintf("%s%s%s", userData.HomeDir, dirSeperator))
+	configuration.KeyFile = []byte(fmt.Sprintf("%s%s%s", userData.HomeDir, dirSeperator))
 
-	confFile := fmt.Sprintf("%s/%s", userData.HomeDir, ".down-low.json")
-	results, err := ioutil.ReadDir(userData.HomeDir)
+	file, ofErr := os.Open(configuration.ConfigFile)
+	if ofErr != nil {
+		log.Fatal(ofErr)
+	}
+
+	decoder := json.NewDecoder(file)
+	gmconf = GmailConf{}
+
+	err = decoder.Decode(&gmconf)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln(err)
 	}
 
-	// TODO: Get rid of this loop.
-	// Look in the user's home dir to find a down-low config file.
-	for _, i := range results {
-		log.Println(i.Name())
-		if i.Name() == confFile {
-			absPath, pathErr := filepath.Abs(i.Name())
-			log.Println(absPath)
-			if pathErr != nil {
-				log.Fatal(pathErr)
-			}
-			file, err := os.Open(absPath)
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			decoder := json.NewDecoder(file)
-			gmconf = GmailConf{}
-
-			err = decoder.Decode(&gmconf)
-			if err != nil {
-				log.Fatalln(err)
-			}
-			break
-		} else {
-			return nil, errors.New("Config file not found!")
-		}
-	}
 	configuration.GmailConfig = &gmconf
 	return &configuration, nil
 }
@@ -129,7 +104,7 @@ func main() {
 		runtime.GOMAXPROCS(runtime.NumCPU())
 	}
 
-	parseArgs()
+	processArgs()
 	conf, err := buildConfig()
 	if err != nil {
 		log.Fatal(err)

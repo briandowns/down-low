@@ -1,8 +1,13 @@
 # down-low
 
-Go (golang) application to send encrypted messages through different messaging services as well as decrypt message sent from other users of this system or anything encrypted with AES provided you have the keys.
+down-low is a secure messaging system written in Go with the ability to send AES and RSA encrypted messages to a number of different endpoints.
+
+## Currently
 
 - Gmail
+
+## Coming Soon...
+
 - Twitter
 - Facebook
 
