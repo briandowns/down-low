@@ -24,27 +24,6 @@ import (
 	"runtime"
 )
 
-type Msg interface {
-	Send(*Configuration)
-}
-
-type Configuration struct {
-	OS          string
-	Username    string
-	HomeDir     string
-	ConfigFile  string
-	GmailConfig *GmailConf
-	KeyFile     []byte
-}
-
-// Primary message data structure.
-type Message struct {
-	From    string
-	To      string
-	Body    []byte
-	Subject string
-}
-
 // New builds a new Message object.
 func New(from string, to string, subject string) *Message {
 	return &Message{From: from, To: to, Subject: subject}
@@ -60,11 +39,11 @@ func processArgs() {
 }
 
 // Determine the type of key given by the user.
-func detectKeyType() *CLIParameters {
+func detectKeyType(config *CLIParameters) {
 	//
 }
 
-// buildConfig will setup the application with the needed configuration from
+// Setup the application with the needed configuration from
 // the environment and from the user defined configuration
 // file.
 func buildConfig(keyPath string) (*Configuration, error) {
