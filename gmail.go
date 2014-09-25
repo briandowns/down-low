@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//
-// Provides the ability to send messages via the user's Gmail account.
-//
+/*
+ Provides the ability to send messages via the user's Gmail account.
+*/
 
 package main
 
@@ -35,6 +35,7 @@ Subject: {{.Subject}}
 `
 )
 
+// Holds the user configured Gmail configuration.
 type GmailConf struct {
 	Server   string `json:"gmail_server_address"`
 	Port     int    `json:"gmail_server_port"`
@@ -43,6 +44,7 @@ type GmailConf struct {
 	Password string `json:"gmail_password"`
 }
 
+// Send sends the message that has been setup.
 func (m *Message) Send(c *Configuration) {
 	emailUser := &GmailConf{c.Username, c.Password, c.Server, c.Port}
 

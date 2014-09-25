@@ -37,6 +37,7 @@ type Configuration struct {
 	KeyFile     []byte
 }
 
+// Primary message data structure.
 type Message struct {
 	From    string
 	To      string
@@ -44,11 +45,12 @@ type Message struct {
 	Subject string
 }
 
+// New builds a new Message object.
 func New(from string, to string, subject string) *Message {
 	return &Message{From: from, To: to, Subject: subject}
 }
 
-// Process the CLI arguments.
+// processArgs processes the CLI arguments.
 func processArgs() {
 	// -key="/path/to/key" -service="service" -to="user@service" -m
 	var keyPath *string = flag.String("key", "", "Path to key file.")
@@ -62,7 +64,7 @@ func detectKeyType() *CLIParameters {
 	//
 }
 
-// Setup the application with the needed configuration from
+// buildConfig will setup the application with the needed configuration from
 // the environment and from the user defined configuration
 // file.
 func buildConfig(keyPath string) (*Configuration, error) {
@@ -74,7 +76,7 @@ func buildConfig(keyPath string) (*Configuration, error) {
 		log.Fatal(err)
 	}
 
-	// TODO: Redo this so it doesn't look so terrible.
+	// TODO(bdowns328): Redo this so it doesn't look so terrible.
 	configuration = Configuration{}
 	configuration.ConfigFile = fmt.Sprintf("%s/%s", userData.HomeDir, ".down-low.json")
 	configuration.OS = runtime.GOOS
@@ -105,9 +107,10 @@ func main() {
 	}
 
 	processArgs()
-	conf, err := buildConfig()
+	conf, err := buildConfig("")
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	fmt.Println(conf)
 }
