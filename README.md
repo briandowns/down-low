@@ -18,7 +18,7 @@ This application is _not yet_ functional.  Work in progress.
 ## Installation
 
 ```bash
-go get github.com/bdowns328/down-low
+go get github.com/briandowns/down-low
 ```
 
 ## Examples
