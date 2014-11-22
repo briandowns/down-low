@@ -9,7 +9,7 @@ import (
 
 // findSSHKeys will look for RSA public and private
 // keys in the users home directory.
-func findSSHKeys() []string {
+func findSSHKeys() ([]string, error) {
 
 }
 

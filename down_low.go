@@ -32,10 +32,10 @@ func New(from string, to string, subject string) *Message {
 // processArgs processes the CLI arguments.
 func processArgs() {
 	// -key="/path/to/key" -service="service" -to="user@service" -m
-	var keyPath *string = flag.String("k", "", "Path to key file.")
-	var service *string = flag.String("s", "", "Service to send message through.")
-	var to *string = flag.String("t", "", "User to send message to.")
-	var message *bool = flag.Bool("m", false, "Message to send.")
+	var keyPath = flag.String("k", "", "Path to key file.")
+	var service = flag.String("s", "", "Service to send message through.")
+	var to = flag.String("t", "", "User to send message to.")
+	var message = flag.Bool("m", false, "Message to send.")
 }
 
 // usage will display the acceptable cli arguments and general
