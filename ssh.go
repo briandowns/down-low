@@ -11,7 +11,7 @@ import (
 // findSSHKeys will look for RSA public and private
 // keys in the users home directory.
 func findSSHKeys() ([]string, error) {
-	keys, err := filepath.Glob(fmt.Sprintf("%s/.ssh/*.pub", Configuration.HomeDir))
+	keys, err := filepath.Glob(fmt.Sprintf("%s/.ssh/*.pub", *Configuration.HomeDir))
 	if err != nil {
 		return "", log.Fatalln(err)
 	}
@@ -34,4 +34,5 @@ func isPublicRSAKey(key string) bool {
 			return result
 		}
 	}
+	return false
 }
