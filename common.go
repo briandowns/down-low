@@ -1,16 +1,16 @@
 package main
 
 const (
-	PUB_KEY_TEXT = "ssh-rsa AAAAB3NzaC1"
+	PubKeyText = "ssh-rsa AAAAB3NzaC1"
 )
 
 type Msg interface {
-	Send(*Configuration)
+	Send(*State)
 }
 
 //privkey := usr.HomeDir + "/.ssh/id_rsa"
 
-type Configuration struct {
+type State struct {
 	OS             string
 	Username       string
 	HomeDir        string
@@ -21,16 +21,13 @@ type Configuration struct {
 	aesConf        *AESConf
 }
 
-func NewSSH() *SSHConf {
-	return &SSHConf{
-		publicKeyPath:  "",
-		privateKeyPath: "",
-	}
-}
-
 type SSHConf struct {
 	publicKeyPath  string
 	privateKeyPath string
+}
+
+func NewSSH() *SSHConf {
+	return &SSHConf{publicKeyPath: "", privateKeyPath: ""}
 }
 
 type AESConf struct {

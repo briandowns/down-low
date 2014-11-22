@@ -30,7 +30,7 @@ func isPublicRSAKey(key string) bool {
 	}
 
 	for _, line := range strings.Split(string(keyData), "\n") {
-		if strings.Contains(line, PUB_KEY_TEXT) {
+		if strings.Contains(line, PubKeyText) {
 			return result
 		}
 	}
