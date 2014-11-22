@@ -25,7 +25,7 @@ import (
 )
 
 // New builds a new Message object.
-func New(from string, to string, subject string) *Message {
+func New(from, to, subject string) *Message {
 	return &Message{From: from, To: to, Subject: subject}
 }
 
