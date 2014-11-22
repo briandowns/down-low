@@ -28,7 +28,7 @@ const (
 To: {{.To}}
 Subject: {{.Subject}}
 
-{{.Body}}
+{{.Secret}}
 `
 )
 
@@ -44,8 +44,8 @@ type GmailConf struct {
 // Send sends the message that has been setup.
 func (m *Message) Send(c *Configuration) {
 	emailUser := &GmailConf{c.Username, c.Password, c.Server, c.Port}
-
 	auth := smtp.PlainAuth("", emailUser.Username, emailUser.Password, emailUser.EmailServer)
+
 	var err error
 	var doc bytes.Buffer
 

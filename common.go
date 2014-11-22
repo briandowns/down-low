@@ -42,6 +42,6 @@ type AESConf struct {
 type Message struct {
 	From    string
 	To      string
-	Body    []byte
+	Secret  []byte
 	Subject string
 }
