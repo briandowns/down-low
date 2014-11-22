@@ -12,15 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/*
- Provides the ability to send messages via the user's Gmail account.
-*/
-
 package main
 
 import (
 	"bytes"
 	"fmt"
+	"log"
 	"net/smtp"
 	"strconv"
 	"text/template"
@@ -58,18 +55,16 @@ func (m *Message) Send(c *Configuration) {
 		[]string{"brian.downs@gmail.com"},
 		doc.Bytes())
 	if err != nil {
-		fmt.Println(err)
+		log.Fatalln(err)
 	}
 
-	t := template.New("emailTemplate")
-
-	t, err = t.Parse(emailTemplate)
+	t, err := template.New("emailTemplate").Parse(emailTemplate)
 	if err != nil {
-		fmt.Println("error trying to parse mail template")
+		log.Fatalln("error trying to parse mail template")
 	}
 
 	err = t.Execute(&doc, m)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatalln(err)
 	}
 }
